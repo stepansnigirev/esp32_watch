@@ -34,29 +34,32 @@ void setup()
   
   delay(100);
   display.init(115200);
-  showAddress(pub.child(0).child(ind).address());
+  showAddress();
 }
 
 void loop(){
+  bool newaddr = false; // do we need to update?
   if(!digitalRead(NEXT_BUTTON)){ // next address
-    digitalWrite(LED_BUILTIN, HIGH); // shine with LED, just because we can
     ind++;
-    EEPROM.writeULong(4, ind); // write new index value
-    EEPROM.commit();
-    showAddress(pub.child(0).child(ind).address());
+    newaddr = true;
   }
   if(!digitalRead(PREV_BUTTON) && ind > 0){ // previous address
-    digitalWrite(LED_BUILTIN, HIGH);
     ind--;
-    EEPROM.writeULong(4, ind);
+    newaddr = true;
+  }
+  if(newaddr){
+    digitalWrite(LED_BUILTIN, HIGH); // shine with LED, just because we can
+    EEPROM.writeULong(4, ind); // write new index value
     EEPROM.commit();
-    showAddress(pub.child(0).child(ind).address());
+    showAddress();
   }
   digitalWrite(LED_BUILTIN, LOW); // stop shining
   delay(100);
 }
 
-void showAddress(String addr){
+void showAddress(){
+  String addr = pub.child(0).child(ind).address();
+  
   display.setRotation(1);
   display.setFont(&FreeMonoBold9pt7b);
   display.setTextColor(GxEPD_BLACK);
